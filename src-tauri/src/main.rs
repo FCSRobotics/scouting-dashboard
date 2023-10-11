@@ -1,6 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use std::fs::{File, self};
+use std::io::Write;
 use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 use std::error::Error;
@@ -102,6 +104,15 @@ struct TeamOverview {
     lifetime_balance_attempts: usize,
     lifetime_overall_rank: usize,
     lifetime_cycle_len: f64,
+    average_cycle: f64,
+    average_auto: f64,
+    average_teleop: f64,
+    balance_skill: f64,
+    average_auto_rank: f64,
+    average_teleop_peices: f64,
+    average_auto_peices: f64,
+    average_rank: f64,
+    average_score: f64,
     team: Team,
  
 }
@@ -167,8 +178,22 @@ fn paste_data(body: String) -> String {
 }
 
 #[tauri::command]
+fn save(data: String)  {
+    let mut file  = File::create("/save.quaker").expect("Error");
+    file.write_all(&data.into_bytes()).expect("Error");
+
+}
+
+#[tauri::command]
+fn load() -> String  {
+    fs::read_to_string("/save.quaker").expect("Error")
+
+}
+
+#[tauri::command]
 fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
-    let mut overview = TeamOverview { wins: 0, losses: 0, lifetime_cones: 0, lifetime_cubes: 0, team: data[0].team.clone() , average_pieces: 0.0};
+    let mut overview = TeamOverview::default();
+    overview.team = data[0].team.clone();
     for game in data.clone() {
         if game.won {overview.wins += 1;} else {overview.losses +=1}
 
@@ -209,21 +234,23 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
         overview.lifetime_overall_rank += overall_rank;
     }
 
-    overview.average_cycle=lifetime_cycle_len/data.len();
-    overview.average_auto=overview.lifetime_auto_grid+overview.lifetime_auto_balance/ data.len();
-    overview.average_teleop=lifetime_teleop_grid+lifetime_teleop_balance+lifetime_parked/ data.len();
-    overview.balance_skill=lifetime_balance_sucesses/lifetime_balance_attempts;
-    overview.average_auto_rank=lifetime_auto_rank/data.len();
-    overview.average_teleop_peices = lifetime_teleop_peices/data.len();
-    average_rank=lifetime_overall_rank/data.len();
-    average_score=average_teleop+avearage_auto;
+    overview.average_cycle=overview.lifetime_cycle_len/(data.len() as f64);
+    overview.average_auto=((overview.lifetime_auto_grid+overview.lifetime_auto_balance) as f64) / (data.len() as f64);
+    overview.average_teleop=
+    ((overview.lifetime_teleop_grid+overview.lifetime_balance+overview.lifetime_parked) as f64)/ (data.len() as f64);
+    overview.balance_skill=(overview.lifetime_balance_sucesses as f64)/(overview.lifetime_balance_attempts as f64);
+    overview.average_auto_rank=(overview.lifetime_auto_rank as f64)/(data.len() as f64);
+    overview.average_auto_peices = (overview.lifetime_auto_pieces as f64)/(data.len() as f64);
+    overview.average_teleop_peices = (overview.lifetime_teleop_pieces as f64)/(data.len() as f64);
+    overview.average_rank=(overview.lifetime_overall_rank as f64)/(data.len() as f64);
+    overview.average_score=overview.average_teleop+overview.average_auto;
     return overview;
 }
 
 fn main() {
     tauri::Builder::default()
         .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![greet, get_index, set_index, calculate_overview, paste_data])
+        .invoke_handler(tauri::generate_handler![greet, get_index, set_index, calculate_overview, paste_data, save, load])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

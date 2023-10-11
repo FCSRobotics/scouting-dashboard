@@ -4,7 +4,15 @@
 	import Modal from "./Modal.svelte";
 
 	import type { TeamOverview, TeamGameData } from "../lib/types";
+	let teamOverviews = [] as TeamOverview[];
 	let teamsData = [] as TeamGameData[][];
+	$: console.log("update"); /*(async () => {
+		teamOverviews = await Promise.all<TeamOverview>(
+			teamsData.map<Promise<TeamOverview>>((data_group) =>
+				invoke("calculate_overview", { data: data_group })
+			)
+		);
+	})();*/
 	let index = 0;
 	let showModal = false;
 </script>
@@ -26,6 +34,15 @@
 		teamsData = [...teamsData];
 	}}
 />
+<div id="save-load">
+	<button on:click={() => invoke("save", { data: JSON.stringify(teamsData) })}
+		>Save</button
+	><button
+		on:click={async () => {
+			teamsData = JSON.parse(await invoke("load"));
+		}}>Load</button
+	>
+</div>
 <main class="container">
 	<div id="team-list">
 		{#each teamsData as _, i}
@@ -76,7 +93,7 @@
 		text-align: center;
 	}
 	#team-view {
-		background-color: #f9fdf7;
+		background-color: hsl(100, 60%, 98%);
 		padding: 2rem;
 		display: flex;
 		flex-direction: column;
@@ -95,5 +112,16 @@
 		border: none;
 		color: white;
 		cursor: pointer;
+	}
+
+	#save-load {
+		display: flex;
+		width: 100%;
+		height: 5vh;
+		flex-direction: row;
+	}
+	#save-load > button {
+		width: 100%;
+		height: 100%;
 	}
 </style>

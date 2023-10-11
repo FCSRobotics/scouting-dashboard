@@ -9,3 +9,10 @@ body,
 
 	font-family: "Roboto Mono", monospace;
 }
+button {
+	margin: 0px;
+	background-color: #3d6520;
+	border: none;
+	color: white;
+	cursor: pointer;
+}

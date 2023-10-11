@@ -6,10 +6,29 @@ export type Team = {
 export type TeamOverview = {
 	wins: number;
 	losses: number;
-	lifetime_cones: number;
-	lifetime_cubes: number;
+	lifetime_auto_grid: number;
+	lifetime_auto_balance: number;
+	lifetime_mobility: number;
+	lifetime_teleop_grid: number;
+	lifetime_balance: number;
+	lifetime_parked: number;
+	lifetime_auto_pieces: number;
+	lifetime_teleop_pieces: number;
+	lifetime_auto_rank: number;
+	lifetime_balance_sucesses: number;
+	lifetime_balance_attempts: number;
+	lifetime_overall_rank: number;
+	lifetime_cycle_len: number;
+	average_cycle: number;
+	average_auto: number;
+	average_teleop: number;
+	balance_skill: number;
+	average_auto_rank: number;
+	average_teleop_peices: number;
+	average_auto_peices: number;
+	average_rank: number;
+	average_score: number;
 	team: Team;
-	average_pieces: number;
 };
 
 export type TeamGameData = {
