@@ -15,12 +15,16 @@
 	})();*/
 	let index = 0;
 	let showModal = false;
+
+
+
 </script>
 
 <Modal
 	bind:showModal
-	onClose={(json) => {
-		console.log(json);
+	onClose={(list) => {
+		console.log(list);
+		list.forEach((json) => {
 		let candidate = teamsData.findIndex(
 			(collection) =>
 				collection.findIndex((game) => game.team.number == json.team.number) !=
@@ -32,6 +36,7 @@
 		}
 		console.log(teamsData);
 		teamsData = [...teamsData];
+	})
 	}}
 />
 <div id="save-load">

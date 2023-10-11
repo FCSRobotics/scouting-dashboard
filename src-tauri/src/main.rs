@@ -99,10 +99,10 @@ struct TeamOverview {
     lifetime_parked: usize,
     lifetime_auto_pieces: usize,
     lifetime_teleop_pieces: usize,
-    lifetime_auto_rank: usize,
+    lifetime_auto_rank: isize,
     lifetime_balance_sucesses: usize,
     lifetime_balance_attempts: usize,
-    lifetime_overall_rank: usize,
+    lifetime_overall_rank: isize,
     lifetime_cycle_len: f64,
     average_cycle: f64,
     average_auto: f64,
@@ -211,7 +211,7 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
         if game.parked {overview.lifetime_parked+=2;}
         let points=(auto_grid+auto_balance_points+teleop_grid+balance);
         overview.lifetime_auto_pieces += game.high_cones_auto+game.high_cubes_auto + game.mid_cones_auto+game.mid_cubes_auto + game.low_cones_auto + game.low_cubes_auto;
-        overview.lifetime_auto_rank += (auto_grid+auto_balance_points);
+        overview.lifetime_auto_rank += (auto_grid+auto_balance_points) as isize;
         if game.balanced_auto==1 {overview.lifetime_auto_rank +=5;} else if (game.balanced_auto==3) {overview.lifetime_auto_rank -=3;} else if (game.balanced_auto==0) {overview.lifetime_auto_rank -=5}
         if game.mobility_auto {overview.lifetime_auto_rank+=2}
         if game.balanced_auto==1 || game.balanced_auto==3 || game.balanced_auto==0 {overview.lifetime_balance_attempts+=1}
@@ -219,7 +219,7 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
         let tele_pieces = game.high_cones+game.high_cubes + game.mid_cones+game.mid_cubes + game.low_cones+game.low_cubes;
         overview.lifetime_teleop_pieces += tele_pieces;
         if game.balanced==1 || game.balanced==3 || game.balanced==0 {overview.lifetime_cycle_len += 115.0/(tele_pieces as f64);} else {overview.lifetime_cycle_len += 135.0/(tele_pieces as f64)}
-        let mut overall_rank = (auto_grid+auto_balance_points+teleop_grid+balance);
+        let mut overall_rank: isize = (auto_grid+auto_balance_points+teleop_grid+balance) as isize;
         if game.balanced_auto==1 {overall_rank +=5;} else if game.balanced_auto==3 {overall_rank -=3;} else if game.balanced_auto==0 {overall_rank -=5}
         if game.mobility_auto {overall_rank+=2}
         if game.balanced==1 {overall_rank +=2;} else if game.balanced==3 {overall_rank -=5;} else if game.balanced==0 {overall_rank -=10}
@@ -227,11 +227,11 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
         if game.sabotage {overall_rank -=10}
         if game.catastrophic_failure {overall_rank -=20}
         if game.won {overall_rank +=10}
-        overall_rank += game.drive_grade;//driving_score;
-        overall_rank += game.overall_grade;
+        overall_rank += game.drive_grade as isize;//driving_score;
+        overall_rank += game.overall_grade as isize;
         if game.defense {overall_rank +=5}
-        overall_rank += tele_pieces*3;
-        overview.lifetime_overall_rank += overall_rank;
+        overall_rank += (tele_pieces*3) as isize;
+        overview.lifetime_overall_rank += overall_rank as isize;
     }
 
     overview.average_cycle=overview.lifetime_cycle_len/(data.len() as f64);
