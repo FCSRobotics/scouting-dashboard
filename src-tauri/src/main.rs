@@ -87,6 +87,18 @@ struct Team {
 }
 
 
+#[derive(Clone,serde::Deserialize, serde::Serialize, Default)]
+struct ProcessedMatch {
+
+    overall_rank: isize,
+    auto_rank: isize,
+    match_number: usize,
+    auto_pieces: usize,
+    teleop_pieces: usize,
+}
+
+
+
 #[derive(serde::Deserialize, serde::Serialize, Default)]
 struct TeamOverview {
     wins: usize,
@@ -114,7 +126,7 @@ struct TeamOverview {
     average_rank: f64,
     average_score: f64,
     team: Team,
- 
+    processed_matches: Vec<ProcessedMatch>
 }
 
 #[derive(Clone,serde::Deserialize, serde::Serialize)]
@@ -232,6 +244,15 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
         if game.defense {overall_rank +=5}
         overall_rank += (tele_pieces*3) as isize;
         overview.lifetime_overall_rank += overall_rank as isize;
+
+        let processed_match = ProcessedMatch {
+            auto_pieces: game.high_cones_auto + game.high_cubes_auto + game.mid_cones_auto + game.mid_cubes_auto + game.low_cones_auto + game.low_cubes_auto,
+            teleop_pieces: game.high_cones + game.high_cubes + game.mid_cones + game.mid_cubes + game.low_cones + game.low_cubes,
+            overall_rank: overall_rank,
+            auto_rank: (auto_grid+auto_balance_points) as isize,
+            match_number: game.match_number
+        };
+        overview.processed_matches.push(processed_match);
     }
 
     overview.average_cycle=overview.lifetime_cycle_len/(data.len() as f64);

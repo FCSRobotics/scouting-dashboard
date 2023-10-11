@@ -1,7 +1,10 @@
 <script lang="ts">
-	import type { Team, TeamOverview } from "./types";
+	import type { Team, TeamGameData, TeamOverview } from "./types";
 	let options = {};
+	let rating_over_time = {};
+	let pieces_over_time = {};
 	let radar_averages = {};
+
 	export let overview: TeamOverview;
 	console.log(overview);
 	$: (() => {
@@ -20,6 +23,84 @@
 			],
 			xaxis: {
 				categories: ["Teleop pieces", "Auto pieces"],
+			},
+		};
+		rating_over_time = {
+			series: [
+				{
+					name: "Auto",
+					data: overview.processed_matches.map((game) => game.auto_rank),
+				},
+				{
+					name: "Overall",
+					data: overview.processed_matches.map((game) => game.overall_rank),
+				},
+			],
+
+			chart: {
+				height: 350,
+				type: "line",
+				zoom: {
+					enabled: false,
+				},
+			},
+			dataLabels: {
+				enabled: false,
+			},
+			stroke: {
+				curve: "straight",
+			},
+			title: {
+				text: "Rating over time",
+				align: "left",
+			},
+			grid: {
+				row: {
+					colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+					opacity: 0.5,
+				},
+			},
+			xaxis: {
+				categories: overview.processed_matches.map((game) => game.match_number),
+			},
+		};
+		pieces_over_time = {
+			series: [
+				{
+					name: "Auto",
+					data: overview.processed_matches.map((game) => game.auto_pieces),
+				},
+				{
+					name: "Teleop",
+					data: overview.processed_matches.map((game) => game.teleop_pieces),
+				},
+			],
+
+			chart: {
+				height: 350,
+				type: "line",
+				zoom: {
+					enabled: false,
+				},
+			},
+			dataLabels: {
+				enabled: false,
+			},
+			stroke: {
+				curve: "straight",
+			},
+			title: {
+				text: "Pieces over time",
+				align: "left",
+			},
+			grid: {
+				row: {
+					colors: ["#f3f3f3", "transparent"], // takes an array which will be repeated on columns
+					opacity: 0.5,
+				},
+			},
+			xaxis: {
+				categories: overview.processed_matches.map((game) => game.match_number),
 			},
 		};
 		// radar_averages = {
@@ -61,5 +142,17 @@
 	{overview.wins} / {overview.losses} ({overview.wins / overview.losses})
 </h2>
 <p>Overall rank: {overview.lifetime_overall_rank}</p>
-<div use:chart={options} />
-<!-- <div use:chart={radar_averages} /> -->
+<div id="charts">
+	<div use:chart={options} />
+	<div use:chart={rating_over_time} />
+	<div use:chart={pieces_over_time} />
+</div>
+
+<style>
+	#charts {
+		width: 100%;
+		height: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+	}
+</style>

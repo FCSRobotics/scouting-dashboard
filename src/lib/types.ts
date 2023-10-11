@@ -3,6 +3,14 @@ export type Team = {
 	number: string;
 };
 
+export type ProcessedMatch = {
+	overall_rank: number;
+	auto_rank: number;
+	match_number: number;
+	auto_pieces: number;
+	teleop_pieces: number;
+};
+
 export type TeamOverview = {
 	wins: number;
 	losses: number;
@@ -29,6 +37,7 @@ export type TeamOverview = {
 	average_rank: number;
 	average_score: number;
 	team: Team;
+	processed_matches: ProcessedMatch[];
 };
 
 export type TeamGameData = {

@@ -15,9 +15,6 @@
 	})();*/
 	let index = 0;
 	let showModal = false;
-
-
-
 </script>
 
 <Modal
@@ -25,18 +22,19 @@
 	onClose={(list) => {
 		console.log(list);
 		list.forEach((json) => {
-		let candidate = teamsData.findIndex(
-			(collection) =>
-				collection.findIndex((game) => game.team.number == json.team.number) !=
-				-1
-		);
-		if (candidate == -1) teamsData.push([json]);
-		else {
-			teamsData[candidate].push(json);
-		}
-		console.log(teamsData);
-		teamsData = [...teamsData];
-	})
+			let candidate = teamsData.findIndex(
+				(collection) =>
+					collection.findIndex(
+						(game) => game.team.number == json.team.number
+					) != -1
+			);
+			if (candidate == -1) teamsData.push([json]);
+			else {
+				teamsData[candidate].push(json);
+			}
+			console.log(teamsData);
+			teamsData = [...teamsData];
+		});
 	}}
 />
 <div id="save-load">
@@ -69,13 +67,35 @@
 				}}>+</button
 			>
 		</div>
+		{#if teamsData.length != 0}
+			<div class="team-display" id="best-button">
+				<button
+					class="team-button"
+					on:click={async () => {
+						let overviews = await Promise.all(
+							teamsData.map(
+								async (it) => await invoke("calculate_overview", { data: it })
+							)
+						);
+						overviews.sort((a, b) =>
+							a.lifetime_overall_rank < b.lifetime_overall_rank ? 1 : -1
+						);
+						console.log(overviews);
+						index = teamsData.findIndex(
+							(it) => it[0].team.number == overviews[0].team.number
+						);
+						console.log(index);
+					}}>Best team</button
+				>
+			</div>
+		{/if}
 	</div>
 	<div id="team-view">
 		{#if teamsData.length != 0}
 			{#await invoke("calculate_overview", { data: teamsData[index] })}
 				<p>loading overview</p>
 			{:then overview}
-				<TeamView {overview} />
+				<TeamView raw_data={teamsData[index]} {overview} />
 				<!-- <p>{JSON.stringify(overview)}</p> -->
 			{:catch error}
 				<p>{error}</p>
@@ -96,6 +116,7 @@
 	#team-list {
 		background-color: rgb(216, 216, 216);
 		text-align: center;
+		height: 100%;
 	}
 	#team-view {
 		background-color: hsl(100, 60%, 98%);
