@@ -45,6 +45,15 @@
 			teamsData = JSON.parse(await invoke("load"));
 		}}>Load</button
 	>
+	<button on:click={async () => {
+		let overviews = await Promise.all(
+							teamsData.map(
+								async (it) => await invoke("calculate_overview", { data: it })
+							)
+						);
+						await invoke("csv", {overviews})
+	}}>Export csv</button
+>
 </div>
 <main class="container">
 	<div id="team-list">

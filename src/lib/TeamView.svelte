@@ -2,7 +2,7 @@
 	import type { Team, TeamGameData, TeamOverview } from "./types";
 	let options = {};
 	let rating_over_time = {};
-	let pieces_over_time = {};
+	let score_over_time = {};
 	let radar_averages = {};
 
 	export let overview: TeamOverview;
@@ -64,15 +64,15 @@
 				categories: overview.processed_matches.map((game) => game.match_number),
 			},
 		};
-		pieces_over_time = {
+		score_over_time = {
 			series: [
 				{
 					name: "Auto",
-					data: overview.processed_matches.map((game) => game.auto_pieces),
+					data: overview.processed_matches.map((game) => game.auto_score),
 				},
 				{
 					name: "Teleop",
-					data: overview.processed_matches.map((game) => game.teleop_pieces),
+					data: overview.processed_matches.map((game) => game.teleop_score),
 				},
 			],
 
@@ -90,7 +90,7 @@
 				curve: "straight",
 			},
 			title: {
-				text: "Pieces over time",
+				text: "Score over time",
 				align: "left",
 			},
 			grid: {
@@ -145,7 +145,11 @@
 <div id="charts">
 	<div use:chart={options} />
 	<div use:chart={rating_over_time} />
-	<div use:chart={pieces_over_time} />
+	<div use:chart={score_over_time} />
+	{#each Object.keys(overview).filter((key) => key != "processed_matches" && key != "team").map((key) => `${key}-${overview[key]}`) as text}
+		<p>{text}</p>
+	{/each}
+
 </div>
 
 <style>

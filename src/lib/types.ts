@@ -4,12 +4,15 @@ export type Team = {
 };
 
 export type ProcessedMatch = {
-	overall_rank: number;
-	auto_rank: number;
-	match_number: number;
-	auto_pieces: number;
-	teleop_pieces: number;
-};
+
+    overall_rank: number;
+    auto_rank: number;
+    match_number: number;
+    auto_pieces: number;
+    teleop_pieces: number;
+    teleop_score: number;
+    auto_score: number;
+}
 
 export type TeamOverview = {
 	wins: number;

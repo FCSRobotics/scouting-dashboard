@@ -6,6 +6,7 @@ use std::io::Write;
 use std::sync::{Mutex, MutexGuard};
 use std::collections::HashMap;
 use std::error::Error;
+use std::time::SystemTime;
 use clipboard::{ClipboardProvider, ClipboardContext};
 
 use tauri::State;
@@ -95,6 +96,8 @@ struct ProcessedMatch {
     match_number: usize,
     auto_pieces: usize,
     teleop_pieces: usize,
+    teleop_score: usize,
+    auto_score: usize,
 }
 
 
@@ -191,14 +194,14 @@ fn paste_data(body: String) -> String {
 
 #[tauri::command]
 fn save(data: String)  {
-    let mut file  = File::create("/save.quaker").expect("Error");
+    let mut file  = File::create("./save.quaker").expect("Error");
     file.write_all(&data.into_bytes()).expect("Error");
 
 }
 
 #[tauri::command]
 fn load() -> String  {
-    fs::read_to_string("/save.quaker").expect("Error")
+    fs::read_to_string("./save.quaker").expect("Error")
 
 }
 
@@ -250,7 +253,9 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
             teleop_pieces: game.high_cones + game.high_cubes + game.mid_cones + game.mid_cubes + game.low_cones + game.low_cubes,
             overall_rank: overall_rank,
             auto_rank: (auto_grid+auto_balance_points) as isize,
-            match_number: game.match_number
+            match_number: game.match_number,
+            teleop_score: teleop_grid + balance,
+            auto_score: auto_grid + auto_balance_points,
         };
         overview.processed_matches.push(processed_match);
     }
@@ -268,10 +273,45 @@ fn calculate_overview(data: Vec<TeamGameData>) -> TeamOverview {
     return overview;
 }
 
+#[tauri::command]
+fn export(overviews: Vec<TeamOverview>)  {
+    let file = File::create(format!("./{}.csv",  SystemTime::now().duration_since(SystemTime::UNIX_EPOCH).unwrap().as_secs())).expect("Unable to create file");
+    let mut wtr = csv::Writer::from_writer(file);
+    wtr.write_record(&["wins",
+        "losses",
+        "lifetime_auto_grid",
+        "lifetime_auto_balance",
+        "lifetime_mobility",
+        "lifetime_teleop_grid",
+        "lifetime_balance",
+        "lifetime_parked",
+        "lifetime_auto_pieces",
+        "lifetime_teleop_pieces",
+        "lifetime_auto_rank",
+        "lifetime_balance_sucesses",
+        "lifetime_balance_attempts",
+        "lifetime_overall_rank",
+        "lifetime_cycle_len",
+        "average_cycle",
+        "average_auto",
+        "average_teleop",
+        "balance_skill",
+        "average_auto_rank",
+        "average_teleop_peices",
+        "average_auto_peices",
+        "average_rank",
+        "average_score",
+        "team",
+        "processed_matches"]).expect("failed to write csv");
+    overviews.iter().for_each(|overview| {wtr.serialize(overview).expect("Failed to write overview");});//wtr.serialize(overviews);
+    wtr.flush().unwrap();
+}
+
+
 fn main() {
     tauri::Builder::default()
         .manage(AppState::default())
-        .invoke_handler(tauri::generate_handler![greet, get_index, set_index, calculate_overview, paste_data, save, load])
+        .invoke_handler(tauri::generate_handler![greet, get_index, set_index, calculate_overview, paste_data, save, load, export])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
