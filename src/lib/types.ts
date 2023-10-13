@@ -1,5 +1,5 @@
 export type Team = {
-	name: string;
+
 	number: string;
 };
 
@@ -71,3 +71,38 @@ export type TeamGameData = {
 	done: boolean;
 	won: boolean;
 };
+
+
+export function defaultTeamGameData(): TeamGameData {
+	return {
+		high_cones_auto: 0,
+		mid_cones_auto: 0,
+		low_cones_auto: 0,
+		high_cubes_auto: 0,
+		mid_cubes_auto: 0,
+		low_cubes_auto: 0,
+		mobility_auto: false,
+		balanced_auto: 0,
+		high_cones: 0,
+		mid_cones: 0,
+		low_cones: 0,
+		high_cubes: 0,
+		mid_cubes: 0,
+		low_cubes: 0,
+		defense: false,
+		balanced: 0,
+		parked: false,
+		catastrophic_failure: false,
+		sabotage: false,
+		drive_grade: 0,
+		overall_grade: 0,
+		notes: "",
+		team: {
+
+			number: ""
+		},
+		match_number: 0,
+		done: false,
+		won: false
+	}
+}

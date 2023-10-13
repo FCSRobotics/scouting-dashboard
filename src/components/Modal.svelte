@@ -1,4 +1,6 @@
-<script>
+<script lang="ts">
+    import { defaultTeamGameData, type TeamGameData } from "../lib/types";
+
 	export let onClose;
 	export let showModal; // boolean
 
@@ -8,6 +10,77 @@
 
 	let json = "";
 
+
+	function parse(text: string) {
+		console.log(JSON.parse(text).map((game: string[]) => {
+			let values = game.map((value) => JSON.parse(value))
+			let temp: TeamGameData = {
+                high_cones_auto: values[0],
+                mid_cones_auto: values[1],
+                low_cones_auto: values[2],
+                high_cubes_auto: values[3],
+                mid_cubes_auto: values[4],
+                low_cubes_auto: values[5],
+                mobility_auto: values[6],
+                balanced_auto: values[7],
+                high_cones: values[8],
+                mid_cones: values[9],
+                low_cones: values[10],
+                high_cubes: values[11],
+                mid_cubes: values[12],
+                low_cubes: values[13],
+                defense: values[14],
+                balanced: values[15],
+                parked: values[16],
+                catastrophic_failure: values[17],
+                sabotage: values[18],
+                drive_grade: values[19],
+                overall_grade: values[20],
+                notes: values[21],
+                team: values[22],
+                match_number: values[23],
+                done: values[24],
+                won: values[25]
+            }
+			
+			return temp;
+		}))
+		return JSON.parse(text).map((game: string[]) => {
+			let values = game.map((value) => JSON.parse(value))
+			let temp: TeamGameData = {
+                high_cones_auto: values[0],
+                mid_cones_auto: values[1],
+                low_cones_auto: values[2],
+                high_cubes_auto: values[3],
+                mid_cubes_auto: values[4],
+                low_cubes_auto: values[5],
+                mobility_auto: values[6],
+                balanced_auto: values[7],
+                high_cones: values[8],
+                mid_cones: values[9],
+                low_cones: values[10],
+                high_cubes: values[11],
+                mid_cubes: values[12],
+                low_cubes: values[13],
+                defense: values[14],
+                balanced: values[15],
+                parked: values[16],
+                catastrophic_failure: values[17],
+                sabotage: values[18],
+                drive_grade: values[19],
+                overall_grade: values[20],
+                notes: values[21],
+                team: values[22],
+                match_number: values[23],
+                done: values[24],
+                won: values[25]
+            }
+			return temp;
+		})
+			
+		
+
+	}
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events a11y-no-noninteractive-element-interactions -->
@@ -15,12 +88,12 @@
 	<!-- svelte-ignore a11y-no-static-element-interactions -->
 	<div on:click|stopPropagation>
 		<label for="json">Paste json:</label>
-		<input type="text" bind:value={json} name="json" id="json" />
+		<input autofocus type="text" bind:value={json} name="json" id="json" />
 		<button
-			autofocus
+			
 			on:click={() => {
 				dialog.close();
-				onClose(JSON.parse(json));
+				onClose(parse(json));
 			}}>Submit</button
 		>
 	</div>
